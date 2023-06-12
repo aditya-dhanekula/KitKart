@@ -1,0 +1,40 @@
+1. Frontend - React, Bootstrap and react-bootstrap
+2. Backend(API) - Node(Express) and MongoDB(Mongoose)
+3. Connect Frontend with Backend - Axios Library(Sending HTTP requests from the frontend to the backend)
+4. Testing - Jest testing framework
+5. Deploy - Heroku(Live Server)
+
+M - MongoDB
+E - Express
+R - React
+N - Node
+
+Server - Node and Express
+Database - MongoDB
+Client Side - React(JS Library for building user interfaces in HTML, CSS, JS)
+
+React is used for building single paged applications which dont require reloading the page.
+
+Node.js is a JS server environment and runs JS outside the web browser.
+
+To simplify the usage of React, we use Express which is a framework for Node.js. 
+
+Express simplifies the routing (sending request from react in the form of URLs)
+
+MongoDB stores data in the form of JSON documents. It is schema less and very flexible.
+
+How the MERN Stack application runs:
+1. React: User sends request to server
+2. Express: Server receives request via defined routing
+3. Express: Sends query to database
+4. MongoDB: Executes query and sends data
+5. Express: Sends response to the user interface
+6. React: Receives response and updates HTML with the new data
+
+JSX: Used to create dynamic HTML components in React apps.
+Important extension for Javascript
+
+In JSX, we can assign HTML code to variables
+Inside curly braces we can write javascript code in between HTML elements
+Wrap the function name in opening and closing tags to render the return value of that function as the HTML output.
+Within parenthesis we can write valid HTML code which can be assigned to variables or returned from a function.

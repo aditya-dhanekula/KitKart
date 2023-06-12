@@ -1,0 +1,3 @@
+Creating a react application: npx create-react-app
+Running a react application: npm start
+index.js is the starting point of our application
