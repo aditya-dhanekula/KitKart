@@ -1,3 +1,6 @@
 Creating a react application: npx create-react-app
 Running a react application: npm start
-index.js is the starting point of our application
+index.js is the starting point of the application
+<App> tag inside index.js will generate the entire application code and the dynamic HTML content is placed inside root which is tied with the div named root in index.html page inside the public folder.
+For routing we must install react-router-dom with the following command: npm install react-router-dom
+import {BrowserRouter, Routes, Route} from "react-router-dom" in app.js
