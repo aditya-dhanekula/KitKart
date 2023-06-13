@@ -1,0 +1,7 @@
+For the frontend, we can make use of bootstrap framework to design the components.
+With bootstrap framework, we need not design the frontend pages from scratch and this helps in developing cleaner web pages quickly.
+We are going to use the react bootstrap package which is the specific bootstrap package for react applications.
+React bootstrap uses bootstrap framework to function internally.
+Installing bootstrap: npm install bootstrap
+Installing react bootstrap: npm install react-bootstrap
+In the index.js file import the bootstrap package by adding the import statement: import "bootstrap/dist/css/bootstrap.min.css"
