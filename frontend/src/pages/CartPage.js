@@ -24,7 +24,7 @@ const CartPage = () => {
                             Price: <span className='fw-bold'>$892</span>
                         </ListGroupItem>
                         <ListGroupItem>
-                            <LinkContainer to="/user/order-details">
+                            <LinkContainer to="/user/cart-details">
                                 <Button type='button'>Proceed To Checkout</Button>
                             </LinkContainer>
                         </ListGroupItem>

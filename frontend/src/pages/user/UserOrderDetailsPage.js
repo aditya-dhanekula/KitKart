@@ -66,7 +66,7 @@ const UserOrderDetailsPage = () => {
                         </ListGroupItem>
                         <ListGroupItem>
                             <div className="d-grid gap-2">
-                                <Button size="lg" variant="danger" type="button">Proceed to Pay</Button>
+                                <Button size="lg" variant="danger" type="button">Complete Payment</Button>
                             </div>
                         </ListGroupItem>
                     </ListGroup>
