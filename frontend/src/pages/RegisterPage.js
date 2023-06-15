@@ -94,8 +94,8 @@ const RegisterPage = () => {
                             </Col>
                         </Row>
                         <Button type="submit" className='mb-3'>
+                            Submit{" "}
                             <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true"/>
-                            Submit
                         </Button>
                         <Alert show={true} variant='danger'>
                             User with that email already exists!
