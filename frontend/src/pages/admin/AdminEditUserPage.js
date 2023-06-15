@@ -1,5 +1,48 @@
+import { Col, Container, Row, Form, Button } from "react-bootstrap"
+import { Link } from "react-router-dom"
+import { useState } from "react"
+
 const AdminEditUserPage = () => {
-    return <p>This is the AdminEditUserPage</p>
+    const [validated, setValidated] = useState(false)
+    const handleSubmit = (event) => {
+        const form = event.currentTarget;
+        if(form.checkValidity() === false){
+            event.preventDefault();
+            event.stopPropogation();
+        }
+        setValidated(true)
+    }
+
+    return (
+        <Container>
+            <Row className="justify-content-md-center mt-5">
+                <Col md={1}>
+                    <Link to="/admin/users" className="btn btn-info my-3">Go Back</Link>
+                </Col>
+                <Col md={6}>
+                    <h1>Edit User</h1>
+                    <Form nonValidate validated={validated} onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3" controlId="formBasicFirstName">
+                            <Form.Label> First Name</Form.Label>
+                            <Form.Control name="firstName" required type="text" defaultValue="Aditya" />
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formBasicLastName">
+                            <Form.Label>Last Name</Form.Label>
+                            <Form.Control name="lastName" required type="text" defaultValue="Dhanekula"/>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formBasicEmail">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control name="email" required type="email" defaultValue="example@email.com"/>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                            <Form.Check name="isAdmin" type="checkbox" label="Give Admin Rights"></Form.Check>
+                        </Form.Group>
+                        <Button variant="primary" type="submit">Update</Button>
+                    </Form>
+                </Col>
+            </Row>
+        </Container>
+    )
 }
 
 export default AdminEditUserPage
