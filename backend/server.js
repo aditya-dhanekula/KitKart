@@ -1,20 +1,30 @@
 const express = require('express')
 const app = express()
 const port = 3000
+const apiRoutes = require("./routes/apiRoutes")
 
-app.use((req, res, next) => {
-    console.log("First middleware")
-    next()
+app.get('/', async (req, res, next) => {
+    res.json({message: "API running" })
 })
 
-app.get('/', (req, res) => {
-    console.log("Second Middleware")
-    res.send('Hello World!')
+//mongodb connection
+const connectDB = require("./config/db")
+const Product = require('./models/ProductModel')
+connectDB();
+
+app.use('/api', apiRoutes)
+
+app.use( (error, req, res, next) => {
+    console.error(error)
+    next(error)
 })
 
-app.get('/two', (req, res) => {
-    res.send('Hello World! 2')
-  })
+app.use( (error, req, res, next) => {
+    res.status(500).json({
+        message: error.message,
+        stack: error.stack
+    })
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

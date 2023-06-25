@@ -38,3 +38,5 @@ In JSX, we can assign HTML code to variables
 Inside curly braces we can write javascript code in between HTML elements
 Wrap the function name in opening and closing tags to render the return value of that function as the HTML output.
 Within parenthesis we can write valid HTML code which can be assigned to variables or returned from a function.
+
+JSON - JavaScript Object Notation: A name and a value, JSON objects can further contain JSON Objects within them.

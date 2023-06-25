@@ -15,3 +15,7 @@ Make sure to stop the process running on port 3000 as our backend application is
 To run the backend application use the command npx nodemon server.js.
 
 We could also use the command node server.js but it will not restart the server whenever there is a change in the sourcecode.
+
+Functions like app.use() will run irrespective of the path provided and hence will not contain the path argument. This function will run for every page.
+
+Functions like app.get() are responsible for handling http requests sent by the web browser and they must send back a response corresponding to the request sent.
