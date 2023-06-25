@@ -9,7 +9,7 @@ const orderSchema = mongoose.Schema({
     },
     orderTotal: {
         itemsCount: {type: Number, required: true},
-        cartSubTotal: {type: Number, required: true}
+        cartSubtotal: {type: Number, required: true}
     },
     cartItems: [
         {
@@ -45,5 +45,5 @@ const orderSchema = mongoose.Schema({
     timestamps: true
 })
 
-const Order = mongoose.Model("Order", orderSchema)
+const Order = mongoose.model("Order", orderSchema)
 module.exports = Order
