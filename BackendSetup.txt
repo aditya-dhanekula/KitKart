@@ -1,0 +1,17 @@
+Create a folder named backend and make sure node is installed in the backend folder.
+
+Initialize node in the backend folder using the command npm init.
+
+Install express framework using the command npm install express.
+
+Install nodemon using the command npm install nodemon.
+
+Nodemon helps in automatically restarting the server when there is change in the code so that changes are reflected in the server without having to manually restart the server everytime we run the project.
+
+Write a basic structure of the Hello World program.
+
+Make sure to stop the process running on port 3000 as our backend application is currently running on port 3000.
+
+To run the backend application use the command npx nodemon server.js.
+
+We could also use the command node server.js but it will not restart the server whenever there is a change in the sourcecode.
