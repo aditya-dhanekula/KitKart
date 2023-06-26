@@ -66,8 +66,8 @@ const saveAttr = async (req, res, next) => {
                     copyAttributeValues.push(val)
                     var newAttributeValues = [...new Set(copyAttributeValues)] 
                     //Set ensures unique values inside the array
+                    categoryExists.attrs[idx].value = newAttributeValues
                 }
-                categoryExists.attrs[idx].value = newAttributeValues
             })
             if(keyDoesNotExistInDatabase){
                 categoryExists.attrs.push({key: key, value: [val]})
