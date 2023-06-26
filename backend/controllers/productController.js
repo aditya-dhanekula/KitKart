@@ -1,5 +1,6 @@
 const recordsPerPage = require("../config/pagination")
 const Product = require("../models/ProductModel")
+const Review = require("../models/ReviewModel")
 
 const getProducts = async (req, res, next) => {
     // res.send("Handling Product Routes, e.g search for products")
@@ -41,7 +42,6 @@ const getProducts = async (req, res, next) => {
             }
         }
 
-
         let attrsQueryCondition = []
         if(req.query.attrs){
             //attrs=RAM-1 TB-2 TB-4 TB,color-blue-red
@@ -61,15 +61,8 @@ const getProducts = async (req, res, next) => {
                     return acc
                 }
             }, [])
-            console.dir(attrsQueryCondition, {depth: null})
+            // console.dir(attrsQueryCondition, {depth: null})
             queryCondition = true
-        }
-
-        if(queryCondition){
-            query = {
-                $and: [priceQueryCondition, ratingQueryCondition, categoryQueryCondition, ...attrsQueryCondition]
-                //...attrsQueryCondition iterates over all objects within that array and each condition is ANDed with the previous query conditions.
-            }
         }
 
         //pagination
@@ -84,11 +77,42 @@ const getProducts = async (req, res, next) => {
             //Square brackets are required for dynamic keys in javaScript
             console.log(sort)
         }
+
+        const searchQuery = req.params.searchQuery || ""
+        let searchQueryCondition = {}
+        let select = {}
+        if(searchQuery) {
+            queryCondition = true
+            searchQueryCondition = { $text: { $search: searchQuery }}
+            select = {
+                score: { $meta: "textScore" }
+            }
+            sort = { score: { $meta: "textScore" } }
+        }
+
+        if(queryCondition){
+            query = {
+                $and: [priceQueryCondition, ratingQueryCondition, categoryQueryCondition, searchQueryCondition, ...attrsQueryCondition]
+                //...attrsQueryCondition iterates over all objects within that array and each condition is ANDed with the previous query conditions.
+            }
+        }
+
         const totalProducts = await Product.countDocuments(query)
-        const products = await Product.find(query).skip(recordsPerPage * (pageNum-1)).sort(sort).limit(recordsPerPage)
+        const products = await Product.find(query).select(select).skip(recordsPerPage * (pageNum-1)).sort(sort).limit(recordsPerPage)
         res.json({products, pageNum, paginationLinksNumber: Math.ceil(totalProducts/recordsPerPage)})
     } catch (error){
         next(error)
     } 
 }
-module.exports = getProducts
+
+const getProductById = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id).populate("reviews").orFail()
+        // populate method will retrieve all the data corresponding to reviews as the reviews are currently being referenced by their ids.
+        res.json(product)
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = {getProducts, getProductById}
