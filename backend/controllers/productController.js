@@ -115,4 +115,92 @@ const getProductById = async (req, res, next) => {
     }
 }
 
-module.exports = {getProducts, getProductById}
+const getBestsellers = async (req, res, next) => {
+    try {
+        const products = await Product.aggregate([
+            // category - asc and sales - desc
+            { $sort: { category: 1, sales: -1} },
+            { $group: { _id: "$category", doc_with_max_sales: { $first: "$$ROOT" } } },
+            { $replaceWith: "$doc_with_max_sales" },
+            { $match: { sales: { $gt: 0 } } },
+            { $project: { _id: 1, name: 1, images: 1, category: 1, description: 1 } },
+            { $limit: 3 }
+        ])
+        res.json(products)
+    } catch (error) {
+        next(error)
+    }
+}
+
+const adminGetProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({}).sort({category: 1}).select("name price category")
+        res.json(products)
+    } catch(error){
+        next(error)
+    }
+}
+
+const adminDeleteProduct = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id).orFail()
+        await product.remove()
+        res.json( { message: "product removed" })
+    } catch(err) {
+        next(err)
+    }
+}
+
+const adminCreateProduct = async (req, res, next) => {
+    try {
+        const product = new Product()
+        const { name, description, count, price, category, attributesTable } = req.body
+        product.name = name
+        product.description = description
+        product.count = count
+        product.price = price
+        product.category = category
+        if( attributesTable.length > 0 ){
+            attributesTable.map( (item) => {
+                product.attrs.push(item)
+            } )
+        }
+        await product.save()
+        
+        res.json({
+            message: "product created",
+            productId: product._id
+        })
+
+    } catch (err) {
+        next(err)
+    }
+}
+
+const adminUpdateProduct = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.params.id).orFail()
+        const { name, description, count, price, category, attributesTable } = req.body
+        product.name = name || product.name
+        product.description = description || product.description
+        product.count = count || product.count
+        product.price = price || product.price
+        product.category = category || product.category
+        if(attributesTable.length > 0){
+            product.attrs = []
+            attributesTable.map((item) => {
+                product.attrs.push(item)
+            })
+        } else {
+            product.attrs = []
+        }
+        await product.save()
+        res.json({
+            message: "Product Updated"
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = {getProducts, getProductById, getBestsellers, adminGetProducts, adminDeleteProduct, adminCreateProduct, adminUpdateProduct }
