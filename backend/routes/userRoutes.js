@@ -1,15 +1,26 @@
-const express = require('express')
-const router = express.Router()
-const {getUsers, registerUser, loginUser} = require("../controllers/userController")
-
-router.post("/register", registerUser)
-router.post("/login", loginUser)
+const express = require("express");
+const router = express.Router();
+const {
+  getUsers,
+  registerUser,
+  loginUser,
+  updateUserProfile,
+  getUserProfile,
+} = require("../controllers/userController");
+const {
+  verifyIsLoggedIn,
+  verifyIsAdmin,
+} = require("../middleware/verifyAuthToken");
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
 // user logged in routes:
-
+router.use(verifyIsLoggedIn);
+router.put("/profile", updateUserProfile);
+router.get("/profile/:id", getUserProfile);
 
 // admin routes:
-router.get("/", getUsers)
+router.use(verifyIsAdmin);
+router.get("/", getUsers);
 
-
-module.exports = router
+module.exports = router;
