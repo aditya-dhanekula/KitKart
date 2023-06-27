@@ -1,5 +1,6 @@
-const User = require("../models/UserModel")
-const Review = require("../models/ReviewModel")
+const User = require("../models/UserModel");
+const Review = require("../models/ReviewModel");
+const Product = require("../models/ProductModel");
 const { hashPassword, comparePasswords } = require("../utils/hashPassword");
 const generateAuthToken = require("../utils/generateAuthToken");
 
@@ -11,6 +12,43 @@ const getUsers = async (req, res, next) => {
     next(err);
   }
 };
+
+const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select("name lastName email isAdmin")
+      .orFail();
+    return res.send(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).orFail();
+    const { name, lastName, email, isAdmin } = req.body;
+    user.name = name || user.name;
+    user.lastName = lastName || user.lastName;
+    user.email = email || user.email;
+    user.idAdmin = isAdmin || user.isAdmin;
+
+    await user.save();
+    return res.send("User Updated");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try{
+    const user = await User.findById(req.params.id).orFail()
+    await user.remove()
+    res.send("User removed")
+  } catch(err){
+    next(err)
+  }
+}
 
 const registerUser = async (req, res, next) => {
   try {
@@ -114,8 +152,8 @@ const loginUser = async (req, res, next) => {
 
 const getUserProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).orFail()
-    return res.send(user)
+    const user = await User.findById(req.params.id).orFail();
+    return res.send(user);
   } catch (err) {
     next(err);
   }
@@ -154,32 +192,82 @@ const updateUserProfile = async (req, res, next) => {
 
 const writeReview = async (req, res, next) => {
   try {
-    const { comment, rating } = req.body
-    if(!(comment && rating)){
-      return res.status(400).send("All inputs are required")
-    }
-    const ObjectId = require("mongodb").ObjectId
-    let reviewId = ObjectId()
+    // We can also handle the transaction using the product model
+    const session = await Review.startSession();
 
-    await Review.create([
-      {
-        _id: reviewId,
-        comment: comment,
-        rating: Number(rating),
-        user: { _id: req.user._id, name: req.user.name + " " + req.user.lastName }
-      }
-    ])
-    res.send("Review created")
-  } catch (err) { 
-    next (err)
+    const { comment, rating } = req.body;
+    if (!(comment && rating)) {
+      return res.status(400).send("All inputs are required");
+    }
+    const ObjectId = require("mongodb").ObjectId;
+    let reviewId = ObjectId();
+
+    const product = await Product.findById(req.params.productId).populate(
+      "reviews"
+    ); //.session(session)
+
+    const alreadyReviewed = product.reviews.find(
+      (r) => r.user._id.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      //await session.abortTransaction()
+      //session.endSession()
+      return res.status(400).send("Product already reviewed");
+    }
+
+    session.startTransaction();
+
+    await Review.create(
+      [
+        {
+          _id: reviewId,
+          comment: comment,
+          rating: Number(rating),
+          user: {
+            _id: req.user._id,
+            name: req.user.name + " " + req.user.lastName,
+          },
+        },
+      ],
+      { session: session }
+    );
+
+    let prc = [...product.reviews];
+    prc.push({ rating: rating });
+
+    product.reviews.push(reviewId);
+
+    if (product.reviews.length === 1) {
+      product.rating = Number(rating);
+      product.reviewsNumber = 1;
+    } else {
+      product.reviewsNumber = product.reviews.length;
+      product.rating =
+        prc
+          .map((item) => Number(item.rating))
+          .reduce((sum, item) => sum + item, 0) / product.reviews.length;
+    }
+
+    await product.save();
+    await session.commitTransaction();
+    session.endSession();
+
+    res.send("Review created");
+  } catch (err) {
+    await session.abortTransaction();
+    next(err);
   }
-}
+};
 
 module.exports = {
   getUsers,
+  getUser,
+  updateUser,
+  deleteUser,
   registerUser,
   loginUser,
   updateUserProfile,
   getUserProfile,
-  writeReview
+  writeReview,
 };
