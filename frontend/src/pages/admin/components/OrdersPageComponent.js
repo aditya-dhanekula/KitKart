@@ -45,7 +45,7 @@ const OrdersPageComponent = ({ fetchOrders }) => {
             {orders.map((order, idx) => (
               <tr key={idx}>
                 <td>{idx + 1}</td>
-                <td> Null {/*order.user.name} {order.user.lastName*/} </td>
+                <td> {order.user.name} {order.user.lastName} </td>
                 <td>{order.createdAt.substring(0, 10)}</td>
                 <td>{order.orderTotal.cartSubtotal}</td>
                 <td>
