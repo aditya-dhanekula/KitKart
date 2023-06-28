@@ -24,7 +24,7 @@ const ProductsPageComponent = ({ fetchProducts, deleteProduct }) => {
       .then((res) => setProducts(res))
       .catch((er) =>
         console.log(
-          "Error in fetching products in useEffect method of productsPageComponent"
+          "Error in fetching products in useEffect method of ProductsPageComponent"
           //er.response.data.message ? er.response.data.message : er.response.data
         )
       );

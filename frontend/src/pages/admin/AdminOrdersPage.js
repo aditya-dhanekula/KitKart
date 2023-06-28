@@ -1,45 +1,16 @@
-import { Row, Col } from "react-bootstrap"
-import Table from 'react-bootstrap/Table'
-import {Link} from 'react-router-dom'
-import AdminLinksComponent from "../../components/admin/AdminLinksComponent"
+import OrdersPageComponent from "./components/OrdersPageComponent";
 
-const AdminOrdersPage = () => {
-    return (
-        <Row className="m-5">
-            <Col md={2}>
-                <AdminLinksComponent/>
-            </Col>
-            <Col md={10}>
-                <h1>Orders</h1>
-                <Table striped bordered hover responsive>
-                <thead>
-                    <tr>
-                    <th>#</th>
-                    <th>User</th>
-                    <th>Date</th>
-                    <th>Total</th>
-                    <th>Delivered</th>
-                    <th>Payment Method</th>
-                    <th>Order Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {["bi bi-check-lg text-success", "bi bi-x-lg text-danger"].map((item, idx) => (
-                        <tr key={idx}>
-                            <td>{idx+1}</td>
-                            <td>Aditya Dhanekula</td>
-                            <td>16-06-2023</td>
-                            <td>$234</td>
-                            <td><i className={item}></i></td>
-                            <td>PayPal</td>
-                            <td><Link to="/admin/order-details">View Details</Link></td>
-                        </tr>
-                    ))}
-                </tbody>
-                </Table>
-            </Col>
-        </Row>
-    )
+import axios from "axios"
+
+const fetchOrders = async (abctrl) => {
+    const { data } = await axios.get("/api/orders/admin", {
+        signal: abctrl.signal
+    })
+    return data
 }
 
-export default AdminOrdersPage
+const AdminOrdersPage = () => {
+  return <OrdersPageComponent fetchOrders={fetchOrders}/>
+};
+
+export default AdminOrdersPage;
