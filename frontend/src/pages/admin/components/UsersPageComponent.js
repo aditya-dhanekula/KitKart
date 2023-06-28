@@ -28,7 +28,8 @@ const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
       .then((res) => setUsers(res))
       .catch((er) =>
         console.log(
-          er.response.data.message ? er.response.data.message : er.response.data
+          "Error in fetching users in useEffect method of UsersPageComponent"
+          //er.response.data.message ? er.response.data.message : er.response.data
         )
       );
     // return executed when the component is unmounted (user leaves the page)
