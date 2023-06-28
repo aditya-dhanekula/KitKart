@@ -45,7 +45,7 @@ const createOrder = async (req, res, next) => {
     });
 
     const order = new Order({
-      user: ObjectId(req.user.id),
+      user: ObjectId(req.user._id),
       orderTotal: orderTotal,
       cartItems: cartItems,
       paymentMethod: paymentMethod,
@@ -72,7 +72,7 @@ const updateOrderToPaid = async (req, res, next) => {
 
 const updateOrderToDelivered = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.body.params).orFail();
+    const order = await Order.findById(req.params.id).orFail();
     order.isDelivered = true;
     order.deliveredAt = Date.now();
     const updatedOrder = await order.save();
