@@ -9,14 +9,14 @@ const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
   // Initial state declaration in react
   // Has to be written within the component itself as state refers to components only
   const [users, setUsers] = useState([]);
-  const [userDeleted, setUserDeleted] = useState(false)
+  const [userDeleted, setUserDeleted] = useState(false);
 
   const deleteHandler = async (userId) => {
     if (window.confirm("Are you sure?")) {
-        const data = await deleteUser(userId)
-        if(data === "User removed"){
-            setUserDeleted(!userDeleted)
-        }
+      const data = await deleteUser(userId);
+      if (data === "User removed") {
+        setUserDeleted(!userDeleted);
+      }
     }
   };
 
@@ -35,7 +35,7 @@ const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
     // return executed when the component is unmounted (user leaves the page)
     return () => abctrl.abort();
   }, [userDeleted]);
-  
+
   return (
     <Row className="m-5">
       <Col md={2}>
@@ -78,7 +78,7 @@ const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
                   <Button
                     variant="danger"
                     className="btn-sm"
-                    onClick={ () => deleteHandler(user._id)}
+                    onClick={() => deleteHandler(user._id)}
                   >
                     <i className="bi bi-x-circle"></i>
                   </Button>
