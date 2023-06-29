@@ -13,7 +13,7 @@ import AddedToCartMessageComponent from "../components/AddedToCartMessageCompone
 import { Rating } from "react-simple-star-rating";
 import ImageZoom from "js-image-zoom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/actions/cartActions";
 
 const ProductDetailsPage = () => {
@@ -23,6 +23,8 @@ const ProductDetailsPage = () => {
         console.log("Before Dispatch")
         dispatch(addToCart())
     }
+
+    const products = useSelector((state) => state.cart.value)
 
   var options = {
     scale: 2,
