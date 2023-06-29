@@ -108,7 +108,7 @@ const loginUser = async (req, res, next) => {
       return res.status(400).send("All inputs are required");
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).orFail()
     if (user && comparePasswords(password, user.password)) {
       let cookieParams = {
         httpOnly: true,
@@ -132,14 +132,14 @@ const loginUser = async (req, res, next) => {
           cookieParams
         )
         .json({
-          sucess: "User logged in",
+          success: "User logged in",
           userLoggedIn: {
             _id: user._id,
             name: user.name,
             lastName: user.lastName,
             email: user.email,
             isAdmin: user.isAdmin,
-            doNotLogout: user.doNotLogout,
+            doNotLogout: doNotLogout,
           },
         });
     } else {
