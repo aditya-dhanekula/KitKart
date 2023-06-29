@@ -41,14 +41,14 @@ const updateUser = async (req, res, next) => {
 };
 
 const deleteUser = async (req, res, next) => {
-  try{
-    const user = await User.findById(req.params.id).orFail()
-    await user.remove()
-    res.send("User removed")
-  } catch(err){
-    next(err)
+  try {
+    const user = await User.findById(req.params.id).orFail();
+    await user.remove();
+    res.send("User removed");
+  } catch (err) {
+    next(err);
   }
-}
+};
 
 const registerUser = async (req, res, next) => {
   try {
@@ -68,7 +68,7 @@ const registerUser = async (req, res, next) => {
         email: email.toLowerCase(),
         password: hashedPassword,
       });
-      res
+      return res
         .cookie(
           "access_token",
           generateAuthToken(
@@ -108,7 +108,7 @@ const loginUser = async (req, res, next) => {
       return res.status(400).send("All inputs are required");
     }
 
-    const user = await User.findOne({ email }).orFail()
+    const user = await User.findOne({ email }).orFail();
     if (user && comparePasswords(password, user.password)) {
       let cookieParams = {
         httpOnly: true,

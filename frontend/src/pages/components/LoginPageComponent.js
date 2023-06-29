@@ -88,7 +88,7 @@ const LoginPageComponent = ({
                 name="password"
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Group className="mb-3" controlId="formBasicDoNotLogout">
               <Form.Check
                 type="checkbox"
                 name="doNotLogout"
