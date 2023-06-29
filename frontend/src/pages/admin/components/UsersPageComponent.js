@@ -29,11 +29,11 @@ const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
     const abctrl = new AbortController();
     fetchUsers(abctrl)
       .then((res) => setUsers(res))
-      .catch((er) => dispatch(logout())
-        // console.log(
-        //   "Error in fetching users in useEffect method of UsersPageComponent"
-        //   //er.response.data.message ? er.response.data.message : er.response.data
-        // )
+      .catch((er) => //dispatch(logout())
+        console.log(
+          "Error in fetching users in useEffect method of UsersPageComponent"
+          //er.response.data.message ? er.response.data.message : er.response.data
+        )
       );
     // return executed when the component is unmounted (user leaves the page)
     return () => abctrl.abort();

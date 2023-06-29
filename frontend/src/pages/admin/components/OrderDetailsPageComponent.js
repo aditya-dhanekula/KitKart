@@ -47,10 +47,10 @@ const OrderDetailsPageComponent = ({ getOrder, markAsDelivered }) => {
         }
         setCartItems(order.cartItems);
       })
-      .catch((er) => dispatch(logout())
-        // console.log(
-        //   "Error in getting order details in useEffect method of OrderDetailsPageComponent"
-        // )
+      .catch((er) => //dispatch(logout())
+        console.log(
+          "Error in getting order details in useEffect method of OrderDetailsPageComponent"
+        )
       );
   }, [isDelivered, id]);
 

@@ -25,11 +25,11 @@ const ProductsPageComponent = ({ fetchProducts, deleteProduct }) => {
     const abctrl = new AbortController();
     fetchProducts(abctrl)
       .then((res) => setProducts(res))
-      .catch((er) => dispatch(logout())
-        // console.log(
-        //   "Error in fetching products in useEffect method of ProductsPageComponent"
-        //   //er.response.data.message ? er.response.data.message : er.response.data
-        // )
+      .catch((er) => //dispatch(logout())
+        console.log(
+          "Error in fetching products in useEffect method of ProductsPageComponent"
+          //er.response.data.message ? er.response.data.message : er.response.data
+        )
       );
     return () => abctrl.abort();
   }, [productDeleted]);

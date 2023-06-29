@@ -15,11 +15,11 @@ const OrdersPageComponent = ({ fetchOrders }) => {
     const abctrl = new AbortController();
     fetchOrders(abctrl)
       .then((res) => setOrders(res))
-      .catch((er) => dispatch(logout())
-        // console.log(
-        //   "Error in fetching orders in useEffect method of OrdersPageComponent"
-        //   //er.response.data.message ? er.response.data.message : er.response.data
-        //)
+      .catch((er) => //dispatch(logout())
+        console.log(
+          "Error in fetching orders in useEffect method of OrdersPageComponent"
+          //er.response.data.message ? er.response.data.message : er.response.data
+        )
       );
 
     return () => abctrl.abort();
