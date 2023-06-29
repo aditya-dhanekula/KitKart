@@ -11,7 +11,11 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import LinkContainer from 'react-router-bootstrap/LinkContainer'
 import {Link} from 'react-router-dom'
 
+import { logout } from "../redux/actions/userActions"
+import { useDispatch } from "react-redux"
+
 const HeaderComponent = () => {
+    const dispatch = useDispatch()
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Container>
@@ -43,7 +47,7 @@ const HeaderComponent = () => {
                         <NavDropdown title="Aditya" id="collasible-nav-dropdown">
                         <NavDropdown.Item eventKey="/user/my-orders" as={Link} to="/user/my-orders">My Orders</NavDropdown.Item>
                         <NavDropdown.Item eventKey="/user" as={Link} to="/user">My Profile</NavDropdown.Item>
-                        <NavDropdown.Item>Logout</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => dispatch(logout())} >Logout</NavDropdown.Item>
                         </NavDropdown>
                         <LinkContainer to="/login">
                             <Nav.Link>Login</Nav.Link>
