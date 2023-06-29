@@ -4,8 +4,11 @@ import { LinkContainer } from "react-router-bootstrap";
 import AdminLinksComponent from "../../../components/admin/AdminLinksComponent";
 
 import { useState, useEffect } from "react";
+import { logout } from "../../../redux/actions/userActions"
+import { useDispatch } from 'react-redux'
 
 const ProductsPageComponent = ({ fetchProducts, deleteProduct }) => {
+  const dispatch = useDispatch()
   const [products, setProducts] = useState([]);
   const [productDeleted, setProductDeleted] = useState(false);
 
@@ -22,11 +25,11 @@ const ProductsPageComponent = ({ fetchProducts, deleteProduct }) => {
     const abctrl = new AbortController();
     fetchProducts(abctrl)
       .then((res) => setProducts(res))
-      .catch((er) =>
-        console.log(
-          "Error in fetching products in useEffect method of ProductsPageComponent"
-          //er.response.data.message ? er.response.data.message : er.response.data
-        )
+      .catch((er) => dispatch(logout())
+        // console.log(
+        //   "Error in fetching products in useEffect method of ProductsPageComponent"
+        //   //er.response.data.message ? er.response.data.message : er.response.data
+        // )
       );
     return () => abctrl.abort();
   }, [productDeleted]);

@@ -4,8 +4,11 @@ import AdminLinksComponent from "../../../components/admin/AdminLinksComponent";
 import { LinkContainer } from "react-router-bootstrap";
 
 import { useState, useEffect } from "react";
+import { logout } from "../../../redux/actions/userActions"
+import { useDispatch } from 'react-redux'
 
 const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
+  const dispatch = useDispatch()
   // Initial state declaration in react
   // Has to be written within the component itself as state refers to components only
   const [users, setUsers] = useState([]);
@@ -26,11 +29,11 @@ const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
     const abctrl = new AbortController();
     fetchUsers(abctrl)
       .then((res) => setUsers(res))
-      .catch((er) =>
-        console.log(
-          "Error in fetching users in useEffect method of UsersPageComponent"
-          //er.response.data.message ? er.response.data.message : er.response.data
-        )
+      .catch((er) => dispatch(logout())
+        // console.log(
+        //   "Error in fetching users in useEffect method of UsersPageComponent"
+        //   //er.response.data.message ? er.response.data.message : er.response.data
+        // )
       );
     // return executed when the component is unmounted (user leaves the page)
     return () => abctrl.abort();

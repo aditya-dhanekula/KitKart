@@ -13,7 +13,12 @@ import CartItemComponent from "../../../components/CartItemComponent";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+import { logout } from "../../../redux/actions/userActions"
+import { useDispatch } from 'react-redux'
+
 const OrderDetailsPageComponent = ({ getOrder, markAsDelivered }) => {
+  
+  const dispatch = useDispatch()
   const { id } = useParams();
 
   const [userInfo, setUserInfo] = useState({});
@@ -42,10 +47,10 @@ const OrderDetailsPageComponent = ({ getOrder, markAsDelivered }) => {
         }
         setCartItems(order.cartItems);
       })
-      .catch((er) =>
-        console.log(
-          "Error in getting order details in useEffect method of OrderDetailsPageComponent"
-        )
+      .catch((er) => dispatch(logout())
+        // console.log(
+        //   "Error in getting order details in useEffect method of OrderDetailsPageComponent"
+        // )
       );
   }, [isDelivered, id]);
 
