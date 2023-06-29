@@ -10,16 +10,30 @@ import {
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const RegisterPageComponent = ({ registerUserApiRequest }) => {
+const RegisterPageComponent = ({
+  registerUserApiRequest,
+  reduxDispatch,
+  setReduxUserState,
+}) => {
   const [validated, setValidated] = useState(false);
+
+  const [registerUserResponseState, setRegisterUserResponseState] = useState({
+    success: "",
+    error: "",
+    loading: false,
+  });
+
+  const [passwordsMatchState, setPasswordsMatchState] = useState(true);
 
   const onChange = () => {
     const password = document.querySelector("input[name=password]");
-    const confirm = document.querySelector("input[name=confirmPassword]");
-    if (confirm.value === password.value) {
-      confirm.setCustomValidity("");
+    const confirmPassword = document.querySelector(
+      "input[name=confirmPassword]"
+    );
+    if (confirmPassword.value === password.value) {
+      setPasswordsMatchState(true)
     } else {
-      confirm.setCustomValidity("Passwords do not match");
+      setPasswordsMatchState(false)
     }
   };
 
@@ -34,13 +48,22 @@ const RegisterPageComponent = ({ registerUserApiRequest }) => {
     if (
       event.currentTarget.checkValidity() === true &&
       email &&
-      name && lastName &&
-      password
+      name &&
+      lastName &&
+      password &&
+      form.password.value === form.confirmPassword.value
     ) {
+      setRegisterUserResponseState({ loading: true });
       registerUserApiRequest(name, lastName, email, password)
-        .then((res) => console.log(res))
+        .then((data) => {
+          setRegisterUserResponseState({
+            success: data.success,
+            loading: false,
+          });
+          reduxDispatch(setReduxUserState(data.userCreated));
+        })
         .catch((er) =>
-          console.log({
+          setRegisterUserResponseState({
             error: er.response.data.message
               ? er.response.data.message
               : er.response.data,
@@ -101,9 +124,10 @@ const RegisterPageComponent = ({ registerUserApiRequest }) => {
                 name="password"
                 minLength={6}
                 onChange={onChange}
+                isInvalid={!passwordsMatchState}
               />
               <Form.Control.Feedback type="invalid">
-                Please enter a valid password
+                Password and confirm password must match
               </Form.Control.Feedback>
               <Form.Text className="text-muted">
                 Password must contain atleast 6 characters
@@ -118,6 +142,7 @@ const RegisterPageComponent = ({ registerUserApiRequest }) => {
                 name="confirmPassword"
                 minLength={6}
                 onChange={onChange}
+                isInvalid={!passwordsMatchState}
               />
               <Form.Control.Feedback type="invalid">
                 Both passwords must match
@@ -132,18 +157,35 @@ const RegisterPageComponent = ({ registerUserApiRequest }) => {
             </Row>
             <Button type="submit" className="mb-3">
               Submit{" "}
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-              />
+              {registerUserResponseState &&
+              registerUserResponseState.loading === true ? (
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              ) : (
+                ""
+              )}
             </Button>
-            <Alert show={true} variant="danger">
+            <Alert
+              show={
+                registerUserResponseState &&
+                registerUserResponseState.error === "User already exists"
+              }
+              variant="danger"
+            >
               User with that email already exists!
             </Alert>
-            <Alert show={true} variant="info">
+            <Alert
+              show={
+                registerUserResponseState &&
+                registerUserResponseState.success === "User created"
+              }
+              variant="info"
+            >
               User created
             </Alert>
           </Form>
