@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 const HeaderComponent = () => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.userRegisterLogin);
+  const itemsCount = useSelector((state) => state.cart.itemsCount)
+
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
@@ -76,7 +78,7 @@ const HeaderComponent = () => {
             )}
             <LinkContainer to="/cart">
               <Nav.Link>
-                <Badge bg="success">3</Badge>
+                <Badge pill bg="success">{itemsCount === 0 ? "" : itemsCount}</Badge>
                 <span className="ms-1"></span>
                 <i className="bi bi-cart2"></i>
                 <span className="ms-1">CART</span>
