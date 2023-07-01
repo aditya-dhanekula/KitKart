@@ -17,7 +17,7 @@ const UserOrderDetailsPageComponent = ({
   userInfo,
   getUser,
   getOrder,
-  loadScript,
+  loadPayPalScript,
 }) => {
   const [userAddress, setUserAddress] = useState({});
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -28,8 +28,8 @@ const UserOrderDetailsPageComponent = ({
   const [isDelivered, setIsDelivered] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
 
-  const paypalContainer = useRef()
-  console.log(paypalContainer)
+  const paypalContainer = useRef();
+  console.log(paypalContainer);
 
   const { id } = useParams();
 
@@ -58,9 +58,12 @@ const UserOrderDetailsPageComponent = ({
         setPaymentMethod(data.paymentMethod);
         setCartItems(data.cartItems);
         setCartSubtotal(data.orderTotal.cartSubtotal);
-        data.isDelivered
-          ? setIsDelivered(data.deliveredAt)
-          : setIsDelivered(false);
+        if(data.isDelivered){
+          setIsDelivered(data.deliveredAt)
+          setOrderButtonMessage("Order Finished");
+        } else {
+          setIsDelivered(false);
+        }
         data.isPaid ? setIsPaid(data.paidAt) : setIsPaid(false);
         if (data.isPaid) {
           setOrderButtonMessage("Order Finished");
@@ -86,20 +89,18 @@ const UserOrderDetailsPageComponent = ({
     if (paymentMethod === "pp") {
       setOrderButtonMessage("To pay, click one of the buttons below");
       if (!isPaid) {
-        loadScript({
-          "client-id":
-            "AbCiuLxVRGw6M5i7U1TOgebuoD19G-guNnDKlxVdj_T6uLyLH_H-9lb1MUMKzlmWTtbKLRwboQbRkqrZ",
-        })
-          .then((paypal) => {
-            paypal.Buttons({}).render("#paypal-container-element");
-          })
-          .catch((err) => {
-            console.log("failed to load the Paypal JS SDK script", err);
-          });
+        loadPayPalScript(cartSubtotal, cartItems, id, updateStateAfterOrder);
       }
     } else {
       setOrderButtonMessage("Your order was placed. Thank you");
     }
+  };
+
+  const updateStateAfterOrder = (paidAt) => {
+    setOrderButtonMessage("Payment Successful");
+    setIsPaid(paidAt);
+    setButtonDisabled(true);
+    paypalContainer.current.style = "display: none";
   };
 
   return (
@@ -142,7 +143,7 @@ const UserOrderDetailsPageComponent = ({
               <Col>
                 <Alert
                   className="mt-3"
-                  variant={isDelivered ? "success" : "danger"}
+                  variant={isPaid ? "success" : "danger"}
                 >
                   {isPaid ? <>Paid on {isPaid}</> : <>Not yet Paid</>}
                 </Alert>

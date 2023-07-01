@@ -9,6 +9,88 @@ const getOrder = async (orderId) => {
   return data;
 };
 
+const loadPayPalScript = (
+  cartSubtotal,
+  cartItems,
+  orderId,
+  updateStateAfterOrder
+) => {
+  loadScript({
+    "client-id":
+      "AbCiuLxVRGw6M5i7U1TOgebuoD19G-guNnDKlxVdj_T6uLyLH_H-9lb1MUMKzlmWTtbKLRwboQbRkqrZ",
+  })
+    .then((paypal) =>
+      paypal
+        .Buttons(buttons(cartSubtotal, cartItems, orderId, updateStateAfterOrder))
+        .render("#paypal-container-element")
+    )
+    .catch((er) => {
+      console.error("Failed to load the paypal JS SDK script ", er);
+    });
+};
+
+const buttons = (cartSubtotal, cartItems, orderId, updateStateAfterOrder) => {
+  return {
+    createOrder: function (data, actions) {
+      return actions.order.create({
+        purchase_units: [
+          {
+            amount: {
+              value: cartSubtotal,
+              breakdown: {
+                item_total: {
+                  currency_code: "USD",
+                  value: cartSubtotal,
+                },
+              },
+            },
+            items: cartItems.map((product) => {
+              return {
+                name: product.name,
+                unit_amount: {
+                  currency_code: "USD",
+                  value: product.price,
+                },
+                quantity: product.quantity,
+              };
+            }),
+          },
+        ],
+      });
+    },
+    onCancel: onCancelHandler,
+    onApprove: function (data, actions) {
+      return actions.order.capture().then(function (orderData) {
+        var transaction = orderData.purchase_units[0].payments.captures[0];
+        if (
+          transaction.status === "COMPLETED" &&
+          Number(transaction.amount.value) === Number(cartSubtotal)
+        ) {
+          updateOrder(orderId).then(data => {
+            if(data.isPaid) {
+              updateStateAfterOrder(data.paidAt)
+            }
+          }).catch((er) => console.log(er))
+        }
+      });
+    },
+    onError: onErrorHandler,
+  };
+};
+
+const onCancelHandler = function () {
+  console.log("onCancelHandler");
+};
+
+const onErrorHandler = function (err) {
+  console.log("onErrorHandler");
+};
+
+const updateOrder = async (orderId) => {
+  const { data } = await axios.put("/api/orders/paid/" + orderId)
+  return data
+}
+
 const UserOrderDetailsPage = () => {
   const userInfo = useSelector((state) => state.userRegisterLogin.userInfo);
 
@@ -22,7 +104,7 @@ const UserOrderDetailsPage = () => {
       userInfo={userInfo}
       getUser={getUser}
       getOrder={getOrder}
-      loadScript={loadScript}
+      loadPayPalScript={loadPayPalScript}
     />
   );
 };
