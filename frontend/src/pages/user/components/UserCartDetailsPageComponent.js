@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import CartItemComponent from "../../../components/CartItemComponent";
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom'
 
 const UserCartDetailsPageComponent = ({
   cartItems,
@@ -20,10 +21,14 @@ const UserCartDetailsPageComponent = ({
   addToCart,
   removeFromCart,
   getUser,
+  createOrder,
 }) => {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [userAddress, setUserAddress] = useState(false);
   const [missingAddress, setMissingAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("pp")
+
+  const navigate = useNavigate()
 
   const changeCount = (productID, count) => {
     reduxDispatch(addToCart(productID, count));
@@ -69,6 +74,35 @@ const UserCartDetailsPageComponent = ({
       );
   }, []);
 
+  const orderHandler = () => {
+    const orderData = {
+      orderTotal: {
+        itemsCount: itemsCount,
+        cartSubtotal: cartSubtotal
+      },
+      cartItems: cartItems.map(item => {
+        return {
+          productId: item.productID,
+          name: item.name,
+          price: item.price,
+          image: { path: item.image ? (item.image.path ?? null ) : null},
+          quantity: item.quantity,
+          count: item.count
+        }
+      }),
+      paymentMethod: paymentMethod,
+    }
+    createOrder(orderData).then((data) => {
+      if(data) {
+        navigate("/user/order-details/" + data._id)
+      }
+    }).catch((err) => console.log(err))
+  }
+
+  const choosePayment = (e) => {
+    setPaymentMethod(e.target.value)
+  }
+
   return (
     <Container fluid>
       <Row className="mt-4">
@@ -86,7 +120,7 @@ const UserCartDetailsPageComponent = ({
             </Col>
             <Col md={6}>
               <h2>Payment Method</h2>
-              <Form.Select>
+              <Form.Select onChange={choosePayment}>
                 <option value="pp">PayPal</option>
                 <option value="cod">
                   Cash on Delivery (Delivery may be delayed)
@@ -142,12 +176,13 @@ const UserCartDetailsPageComponent = ({
             <ListGroupItem>
               <div className="d-grid gap-2">
                 <Button
+                  onClick={orderHandler}
                   disabled={buttonDisabled}
                   size="lg"
                   variant="danger"
                   type="button"
                 >
-                  Pay for the order
+                  Place order
                 </Button>
               </div>
             </ListGroupItem>

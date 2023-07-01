@@ -10,6 +10,7 @@ const RemoveFromCartComponent = ({
   return (
     <Button
       disabled={orderCreated}
+      hidden={orderCreated}
       type="button"
       variant="secondary"
       onClick={
