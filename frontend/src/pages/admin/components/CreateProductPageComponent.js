@@ -19,6 +19,7 @@ const CreateProductPageComponent = ({
   categories,
   reduxDispatch,
   newCategory,
+  deleteCategory
 }) => {
   const [validated, setValidated] = useState(false);
   const [attributesTable, setAttributesTable] = useState([]);
@@ -103,6 +104,12 @@ const CreateProductPageComponent = ({
     }
   };
 
+  const deleteCategoryHandler = () => {
+    let element = document.getElementById("cats")
+    reduxDispatch(deleteCategory(element.value))
+    setCategoryChoosen("Choose Category")
+  }
+
   return (
     <Container>
       <Row className="justify-content-md-center mt-5">
@@ -146,7 +153,7 @@ const CreateProductPageComponent = ({
             <Form.Group className="mb-3" controlId="formBasicCategory">
               <Form.Label>
                 Category
-                <CloseButton></CloseButton>(<small>Remove Selected</small>)
+                <CloseButton onClick={deleteCategoryHandler} ></CloseButton>(<small>Remove Selected</small>)
               </Form.Label>
               <Form.Select
                 id="cats"
