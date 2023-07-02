@@ -16,6 +16,9 @@ const CreateProductPageComponent = ({
   createProductApiRequest,
   uploadImagesApiRequest,
   uploadImagesCloudinaryApiRequest,
+  categories,
+  reduxDispatch,
+  newCategory,
 }) => {
   const [validated, setValidated] = useState(false);
   const [attributesTable, setAttributesTable] = useState([]);
@@ -25,6 +28,7 @@ const CreateProductPageComponent = ({
     message: "",
     error: "",
   });
+  const [categoryChoosen, setCategoryChoosen] = useState("Choose Category");
 
   const navigate = useNavigate();
 
@@ -82,6 +86,23 @@ const CreateProductPageComponent = ({
     setImages(images);
   };
 
+  const checkKeyDown = (e) => {
+    if (e.code === "Enter") e.preventDefault();
+  };
+
+  const newCategoryHandler = (e) => {
+    e.preventDefault();
+    if (e.keyCode && e.keyCode === 13 && e.target.value) {
+      reduxDispatch(newCategory(e.target.value));
+      setTimeout(() => {
+        let element = document.getElementById("cats");
+        element.value = e.target.value;
+        setCategoryChoosen(e.target.value);
+        e.target.value = "";
+      }, 200);
+    }
+  };
+
   return (
     <Container>
       <Row className="justify-content-md-center mt-5">
@@ -92,7 +113,12 @@ const CreateProductPageComponent = ({
         </Col>
         <Col md={6}>
           <h1>Create a new product</h1>
-          <Form nonValidate validated={validated} onSubmit={handleSubmit}>
+          <Form
+            nonValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+            onKeyDown={(e) => checkKeyDown(e)}
+          >
             <Form.Group className="mb-3" controlId="formBasicName">
               <Form.Label>Name</Form.Label>
               <Form.Control name="name" required type="text" />
@@ -123,21 +149,28 @@ const CreateProductPageComponent = ({
                 <CloseButton></CloseButton>(<small>Remove Selected</small>)
               </Form.Label>
               <Form.Select
+                id="cats"
                 required
                 name="category"
                 aria-label="Default select example"
               >
-                <option value="">Choose category</option>
-                <option value="1">Laptops</option>
-                <option value="2">TV</option>
-                <option value="3">Games</option>
+                <option value="Choose Category">Choose Category</option>
+                {categories.map((category, idx) => (
+                  <option key={idx} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicNewCategory">
               <Form.Label>
                 Create New Category (e.g. Computers/Laptops/Intel){" "}
               </Form.Label>
-              <Form.Control name="newCategory" type="text"></Form.Control>
+              <Form.Control
+                onKeyUp={newCategoryHandler}
+                name="newCategory"
+                type="text"
+              ></Form.Control>
             </Form.Group>
             <Row className="mt-5">
               <Col md={6}>
@@ -193,7 +226,7 @@ const CreateProductPageComponent = ({
                 <Form.Group className="mb-3" controlId="formBasicNewAttribute">
                   <Form.Label>Create New Attribute</Form.Label>
                   <Form.Control
-                    disabled={false}
+                    disabled={categoryChoosen === "Choose Category"}
                     placeholder="First choose or create category"
                     name="newAttribute"
                     type="text"
@@ -207,7 +240,7 @@ const CreateProductPageComponent = ({
                 >
                   <Form.Label>Attribute Value</Form.Label>
                   <Form.Control
-                    disabled={false}
+                    disabled={categoryChoosen === "Choose Category"}
                     name="newAttrValue"
                     placeholder="First choose or create category"
                     required={true}
