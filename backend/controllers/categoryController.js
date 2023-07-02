@@ -49,12 +49,12 @@ const deleteCategory = async (req, res, next) => {
 }
 
 const saveAttr = async (req, res, next) => {
-    const {key, val, categoryChosen} = req.body
-    if(!key || !val || !categoryChosen){
+    const {key, val, categoryChoosen} = req.body
+    if(!key || !val || !categoryChoosen){
         return res.status(400).send("All inputs are required")
     }
     try{
-        const category = categoryChosen.split("/")[0]
+        const category = categoryChoosen.split("/")[0]
         const categoryExists = await Category.findOne({name: category}).orFail()
         if(categoryExists.attrs.length > 0){
             //if key exists in the database then add a value to the key
