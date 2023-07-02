@@ -219,7 +219,7 @@ const adminUpload = async (req, res, next) => {
         const { v4: uuidv4 } = require("uuid")
         const uploadDirectory = path.resolve(__dirname, "../../frontend", "public", "images", "products")
 
-        let product = await Product.findById(req.param.productId).orFail()
+        let product = await Product.findById(req.query.productId).orFail()
 
         let imagesTable = []
 
