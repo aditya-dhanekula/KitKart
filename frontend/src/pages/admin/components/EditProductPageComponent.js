@@ -27,7 +27,9 @@ const EditProductPageComponent = ({
   fetchProduct,
   updateProductApiRequest,
   reduxDispatch,
-  saveAttributeToCatDoc
+  saveAttributeToCatDoc,
+  imageDeleteHandler,
+  uploadHandler,
 }) => {
   const [validated, setValidated] = useState(false);
   const [product, setProduct] = useState({});
@@ -40,6 +42,9 @@ const EditProductPageComponent = ({
   const [categoryChoosen, setCategoryChoosen] = useState("Choose category");
   const [newAttrKey, setNewAttrKey] = useState(false);
   const [newAttrValue, setNewAttrValue] = useState(false);
+  const [imageRemoved, setImageRemoved] = useState(false);
+  const [isUploading, setIsUploading] = useState("");
+  const [imageUploaded, setImageUploaded] = useState(false);
 
   const attrVal = useRef(null);
   const attrKey = useRef(null);
@@ -73,7 +78,7 @@ const EditProductPageComponent = ({
     fetchProduct(id)
       .then((product) => setProduct(product))
       .catch((er) => console.log(er));
-  }, []);
+  }, [id, imageRemoved, imageUploaded]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -190,7 +195,9 @@ const EditProductPageComponent = ({
   const addNewAttributeManually = (e) => {
     if (e.keyCode && e.keyCode === 13) {
       if (newAttrKey && newAttrValue) {
-        reduxDispatch(saveAttributeToCatDoc(newAttrKey, newAttrValue, categoryChoosen))
+        reduxDispatch(
+          saveAttributeToCatDoc(newAttrKey, newAttrValue, categoryChoosen)
+        );
         setAttributesTableWrapper(newAttrKey, newAttrValue);
         e.target.value = "";
         createNewAttrKey.current.value = "";
@@ -395,12 +402,39 @@ const EditProductPageComponent = ({
                         src={image.path ?? null}
                         fluid
                       />
-                      <i style={onHover} className="bi bi-x text-danger"></i>
+                      <i
+                        style={onHover}
+                        onClick={() =>
+                          imageDeleteHandler(image.path, id).then((data) =>
+                            setImageRemoved(!imageRemoved)
+                          )
+                        }
+                        className="bi bi-x text-danger"
+                      ></i>
                     </Col>
                   ))}
               </Row>
               <br />
-              <Form.Control required type="file" multiple />
+              <Form.Control
+                type="file"
+                multiple
+                onChange={(e) => {
+                  setIsUploading("File upload in progress ...");
+                  uploadHandler(e.target.files, id)
+                    .then((data) => {
+                      setIsUploading("Files successfully uploaded");
+                      setImageUploaded(!imageUploaded);
+                    })
+                    .catch((er) =>
+                      setIsUploading(
+                        er.response.data.message
+                          ? er.response.data.message
+                          : er.response.data
+                      )
+                    );
+                }}
+              />
+              {isUploading}
             </Form.Group>
             <Button variant="primary" type="submit">
               Update
