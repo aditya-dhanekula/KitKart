@@ -30,6 +30,8 @@ const EditProductPageComponent = ({
   saveAttributeToCatDoc,
   imageDeleteHandler,
   uploadHandler,
+  uploadImagesApiRequest,
+  uploadImagesCloudinaryApiRequest,
 }) => {
   const [validated, setValidated] = useState(false);
   const [product, setProduct] = useState({});
@@ -416,22 +418,34 @@ const EditProductPageComponent = ({
               </Row>
               <br />
               <Form.Control
+                required
                 type="file"
                 multiple
                 onChange={(e) => {
                   setIsUploading("File upload in progress ...");
-                  uploadHandler(e.target.files, id)
-                    .then((data) => {
-                      setIsUploading("Files successfully uploaded");
-                      setImageUploaded(!imageUploaded);
-                    })
-                    .catch((er) =>
-                      setIsUploading(
-                        er.response.data.message
-                          ? er.response.data.message
-                          : er.response.data
-                      )
+                  if (process.env.NODE_ENV !== "production") {
+                    // To do: change to !==
+                    uploadImagesApiRequest(e.target.files, id)
+                      .then((data) => {
+                        setIsUploading("upload file completed");
+                        setImageUploaded(!imageUploaded);
+                      })
+                      .catch((er) =>
+                        setIsUploading(
+                          er.response.data.message
+                            ? er.response.data.message
+                            : er.response.data
+                        )
+                      );
+                  } else {
+                    uploadImagesCloudinaryApiRequest(e.target.files, id);
+                    setIsUploading(
+                      "File upload completed. Wait for the result to take effect, refresh if necessary"
                     );
+                    setTimeout(() => {
+                      setImageUploaded(!imageUploaded)
+                    }, 5000)
+                  }
                 }}
               />
               {isUploading}
