@@ -8,7 +8,7 @@ const AdminEditUserPage = () => {
         const form = event.currentTarget;
         if(form.checkValidity() === false){
             event.preventDefault();
-            event.stopPropogation();
+            event.stopPropagation();
         }
         setValidated(true)
     }

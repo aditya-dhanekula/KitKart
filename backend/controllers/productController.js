@@ -197,7 +197,7 @@ const adminUpdateProduct = async (req, res, next) => {
         }
         await product.save()
         res.json({
-            message: "Product Updated"
+            message: "Product updated"
         })
     } catch (error) {
         next(error)

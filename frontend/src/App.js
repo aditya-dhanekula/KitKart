@@ -60,7 +60,7 @@ function App() {
           <Route path="/admin/edit-user" element={<AdminEditUserPage/>}></Route>
           <Route path="/admin/products" element={<AdminProductsPage/>}></Route>
           <Route path="/admin/create-new-product" element={<AdminCreateProductPage/>}></Route>
-          <Route path="/admin/edit-product" element={<AdminEditProductPage/>}></Route>
+          <Route path="/admin/edit-product/:id" element={<AdminEditProductPage/>}></Route>
           <Route path="/admin/orders" element={<AdminOrdersPage/>}></Route>
           <Route path="/admin/order-details/:id" element={<AdminOrderDetailsPage/>}></Route>
           <Route path="/admin/chats" element={<AdminChatsPage/>}></Route>
