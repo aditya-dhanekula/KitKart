@@ -93,7 +93,6 @@ const AnalyticsPageComponent = ({
         }
       }
     };
-    console.log(0)
     socket.on("newOrder", handler);
     return () => socket.off("newOrder", handler);
   }, [
