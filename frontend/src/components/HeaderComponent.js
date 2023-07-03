@@ -15,7 +15,7 @@ import { logout } from "../redux/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCategories } from "../redux/actions/categoryActions";
-import DropdownItem from "react-bootstrap/esm/DropdownItem";
+
 
 const HeaderComponent = () => {
   const dispatch = useDispatch();
