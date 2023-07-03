@@ -57,7 +57,7 @@ function App() {
 
         <Route element={<ProtectedRoutesComponent admin={true}/>}>
           <Route path="/admin/users" element={<AdminUsersPage/>}></Route>
-          <Route path="/admin/edit-user" element={<AdminEditUserPage/>}></Route>
+          <Route path="/admin/edit-user/:id" element={<AdminEditUserPage/>}></Route>
           <Route path="/admin/products" element={<AdminProductsPage/>}></Route>
           <Route path="/admin/create-new-product" element={<AdminCreateProductPage/>}></Route>
           <Route path="/admin/edit-product/:id" element={<AdminEditProductPage/>}></Route>
