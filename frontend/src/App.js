@@ -39,7 +39,7 @@ function App() {
       <Routes>
         <Route element={<RoutesWithUserChatComponent/>}>
           <Route path="/" element={<HomePage/>}></Route>
-          <Route path="/product-list" element={<ProductListPage/>}></Route>
+          <Route path="/product-list/category/:categoryName" element={<ProductListPage/>}></Route>
           <Route path="/product-details/:id" element={<ProductDetailsPage/>}></Route>
           <Route path="/cart" element={<CartPage/>}></Route>
           <Route path="/login" element={<LoginPage/>}></Route>
