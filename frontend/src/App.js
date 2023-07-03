@@ -41,7 +41,7 @@ function App() {
           <Route path="/" element={<HomePage />}></Route>
           <Route path="/product-list" element={<ProductListPage />}></Route>
           <Route
-            path="/product-list/:pageNum"
+            path="/product-list/:pageNumParam"
             element={<ProductListPage />}
           ></Route>
           <Route
@@ -49,7 +49,7 @@ function App() {
             element={<ProductListPage />}
           ></Route>
           <Route
-            path="/product-list/category/:categoryName/:pageNum"
+            path="/product-list/category/:categoryName/:pageNumParam"
             element={<ProductListPage />}
           ></Route>
           <Route
@@ -57,7 +57,7 @@ function App() {
             element={<ProductListPage />}
           ></Route>
           <Route
-            path="/product-list/search/:searchQuery/:pageNum"
+            path="/product-list/search/:searchQuery/:pageNumParam"
             element={<ProductListPage />}
           ></Route>
           <Route
@@ -65,7 +65,7 @@ function App() {
             element={<ProductListPage />}
           ></Route>
           <Route
-            path="/product-list/category/:categoryName/search/:searchQuery/:pageNum"
+            path="/product-list/category/:categoryName/search/:searchQuery/:pageNumParam"
             element={<ProductListPage />}
           ></Route>
           <Route
