@@ -9,21 +9,51 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import LinkContainer from "react-router-bootstrap/LinkContainer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { logout } from "../redux/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react"
+import { useEffect, useState } from "react";
 import { getCategories } from "../redux/actions/categoryActions";
+import DropdownItem from "react-bootstrap/esm/DropdownItem";
 
 const HeaderComponent = () => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.userRegisterLogin);
-  const itemsCount = useSelector((state) => state.cart.itemsCount)
+  const itemsCount = useSelector((state) => state.cart.itemsCount);
+  const { categories } = useSelector((state) => state.getCategories);
+
+  const [searchCategoryToggle, setSearchCategoryToggle] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getCategories())
-  }, [dispatch])
+    dispatch(getCategories());
+  }, [dispatch]);
+
+  const submitHandler = (e) => {
+    if (e.keyCode && e.keyCode !== 13) return;
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      if (searchCategoryToggle === "All") {
+        navigate(`/product-list/search/${searchQuery}`);
+      } else {
+        navigate(
+          `/product-list/category/${searchCategoryToggle.replaceAll(
+            "/",
+            ","
+          )}/search/${searchQuery}`
+        );
+      }
+    } else if (searchCategoryToggle !== "All") {
+      navigate(
+        `/product-list/category/${searchCategoryToggle.replaceAll("/", ",")}`
+      );
+    } else {
+      navigate("/product-list")
+    }
+  };
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -35,19 +65,35 @@ const HeaderComponent = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <InputGroup>
-              <DropdownButton id="dropdown-basic-button" title="All">
-                <Dropdown.Item>Electronics</Dropdown.Item>
-                <Dropdown.Item>Books</Dropdown.Item>
-                <Dropdown.Item>Cars</Dropdown.Item>
+              <DropdownButton
+                id="dropdown-basic-button"
+                title={searchCategoryToggle}
+              >
+                <Dropdown.Item onClick={() => setSearchCategoryToggle("All")}>
+                  All
+                </Dropdown.Item>
+                {categories.map((category, id) => (
+                  <Dropdown.Item
+                    onClick={() => setSearchCategoryToggle(category.name)}
+                    key={id}
+                  >
+                    {category.name}
+                  </Dropdown.Item>
+                ))}
               </DropdownButton>
-              <Form.Control type="text" placeholder="Search in shop ..." />
-              <Button variant="warning">
+              <Form.Control
+                onKeyUp={submitHandler}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                type="text"
+                placeholder="Search in shop ..."
+              />
+              <Button onClick={submitHandler} variant="warning">
                 <i className="bi bi-search"></i>
               </Button>
             </InputGroup>
           </Nav>
           <Nav>
-            { userInfo && userInfo.isAdmin ? (
+            {userInfo && userInfo.isAdmin ? (
               <LinkContainer to="/admin/orders">
                 <Nav.Link>
                   <Badge pill bg="primary">
@@ -57,7 +103,10 @@ const HeaderComponent = () => {
                 </Nav.Link>
               </LinkContainer>
             ) : userInfo && userInfo.name && !userInfo.isAdmin ? (
-              <NavDropdown title={`${userInfo.name} ${userInfo.lastName}`} id="collasible-nav-dropdown">
+              <NavDropdown
+                title={`${userInfo.name} ${userInfo.lastName}`}
+                id="collasible-nav-dropdown"
+              >
                 <NavDropdown.Item
                   eventKey="/user/my-orders"
                   as={Link}
@@ -84,7 +133,9 @@ const HeaderComponent = () => {
             )}
             <LinkContainer to="/cart">
               <Nav.Link>
-                <Badge pill bg="success">{itemsCount === 0 ? "" : itemsCount}</Badge>
+                <Badge pill bg="success">
+                  {itemsCount === 0 ? "" : itemsCount}
+                </Badge>
                 <span className="ms-1"></span>
                 <i className="bi bi-cart2"></i>
                 <span className="ms-1">CART</span>
