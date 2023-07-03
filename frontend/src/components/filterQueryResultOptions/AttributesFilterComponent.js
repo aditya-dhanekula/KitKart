@@ -1,19 +1,62 @@
-import Form from 'react-bootstrap/Form';
+import Form from "react-bootstrap/Form";
 
-const AttributesFilterComponent = () => {
-    return (
-        <>
-            {[{Color: ["Red", "Blue", "Green"]}, {RAM: ["2 GB", "4 GB", "8 GB", "16 GB"]}].map((item, idx) => (
-                <div key={idx} className='mb-3'>
-                    <Form.Label><b>{Object.keys(item)}</b></Form.Label>
-                    {item[Object.keys(item)].map((i, idx)=>(
-                        <Form.Check key={idx} type="checkbox" id="default-checkbox" label={i}></Form.Check>
-                    ))}
-                </div>
-                
+const AttributesFilterComponent = ({ attrsFilter, setAttrsFromFilter }) => {
+  return (
+    <>
+      {attrsFilter &&
+        attrsFilter.length > 0 &&
+        attrsFilter.map((filter, idx) => (
+          <div key={idx} className="mb-3">
+            <Form.Label>
+              <b>{filter.key}</b>
+            </Form.Label>
+            {filter.value.map((valueForKey, idx2) => (
+              <Form.Check
+                key={idx2}
+                type="checkbox"
+                id="default-checkbox"
+                label={valueForKey}
+                onChange={(e) => {
+                  setAttrsFromFilter((filters) => {
+                    if (filters.length === 0) {
+                      return [{ key: filter.key, values: [valueForKey] }];
+                    }
+                    let index = filters.findIndex(
+                      (item) => item.key === filter.key
+                    );
+                    if (index === -1) {
+                      return [
+                        ...filters,
+                        { key: filter.key, values: [valueForKey] },
+                      ];
+                    }
+                    if (e.target.checked) {
+                      filters[index].values.push(valueForKey);
+                      let unique = [...new Set(filters[index].values)];
+                      filters[index].values = unique;
+                      return [...filters];
+                    }
+                    let valuesWithoutUnChecked = filters[index].values.filter(
+                      (val) => val !== valueForKey
+                    );
+                    filters[index].values = valuesWithoutUnChecked;
+                    if (valuesWithoutUnChecked.length > 0) {
+                      return [...filters];
+                    } 
+                    else {
+                      let filtersWithoutOneKey = filters.filter(
+                        (item) => item.key !== filter.key
+                      );
+                      return [...filtersWithoutOneKey]
+                    }
+                  });
+                }}
+              ></Form.Check>
             ))}
-        </>
-    )
-}
+          </div>
+        ))}
+    </>
+  );
+};
 
-export default AttributesFilterComponent
+export default AttributesFilterComponent;

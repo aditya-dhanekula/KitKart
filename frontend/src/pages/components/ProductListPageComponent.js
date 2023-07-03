@@ -13,14 +13,63 @@ import ProductForListComponent from "../../components/ProductForListComponent";
 import PaginationComponent from "../../components/PaginationComponent";
 
 import { useState, useEffect } from "react";
+import { useLocation, useParams } from "react-router-dom";
 
-const ProductListPageComponent = ({ getProducts }) => {
+const ProductListPageComponent = ({ getProducts, categories }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [attrsFilter, setAttrsFilter] = useState([]); // Collect category attributes from db and show on the website
+  const [attrsFromFilter, setAttrsFromFilter] = useState([]); //Collect user filters for category attributes
+  const [showResetFiltersButton, setShowResetFiltersButton] = useState(false);
+
+  const [filters, setFilters] = useState({}); //Collecting all filters
+  const [price, setPrice] = useState(500);
+  const [ratingsFromFilter, setRatingsFromFilter] = useState({});
+  const [categoriesFromFilter, setCategoriesFromFilter] = useState({});
+  const [sortOption, setSortOption] = useState("")
+
+  const { categoryName } = useParams() || "";
+  const { pageNumParam } = useParams() || ""
+  const { searchQuery } = useParams() || ""
+  const location = useLocation();
 
   useEffect(() => {
-    getProducts()
+    if (categoryName) {
+      let categoryAllData = categories.find(
+        (item) => item.name === categoryName.replaceAll(",", "/")
+      );
+      if (categoryAllData) {
+        let mainCategory = categoryAllData.name.split("/")[0];
+        let index = categories.findIndex((item) => item.name === mainCategory);
+        setAttrsFilter(categories[index].attrs);
+      }
+    } else {
+      setAttrsFilter([]);
+    }
+  }, [categoryName, categories]);
+
+  useEffect(() => {
+    if (Object.entries(categoriesFromFilter).length > 0) {
+      setAttrsFilter([]);
+      var cat = [];
+      var count;
+      Object.entries(categoriesFromFilter).forEach(([category, checked]) => {
+        if (checked) {
+          var name = category.split("/")[0];
+          cat.push(name);
+          count = cat.filter((x) => x === name).length;
+          if (count === 1) {
+            var index = categories.findIndex((item) => item.name === name);
+            setAttrsFilter((attrs) => [...attrs, ...categories[index].attrs]);
+          }
+        }
+      });
+    }
+  }, [categoriesFromFilter, categories]);
+
+  useEffect(() => {
+    getProducts(categoryName, pageNumParam, searchQuery, filters, sortOption)
       .then((products) => {
         setProducts(products.products);
         setLoading(false);
@@ -29,7 +78,23 @@ const ProductListPageComponent = ({ getProducts }) => {
         console.log(er);
         setError(true);
       });
-  }, []);
+  }, [categoryName, pageNumParam, searchQuery, filters, sortOption]);
+
+  const handleFilters = () => {
+    setShowResetFiltersButton(true);
+    setFilters({
+      price: price,
+      rating: ratingsFromFilter,
+      category: categoriesFromFilter,
+      attrs: attrsFromFilter,
+    });
+  };
+
+  const resetFilters = () => {
+    setShowResetFiltersButton(false);
+    setFilters({});
+    window.location.href = "/product-list";
+  };
 
   return (
     <Container fluid>
@@ -37,25 +102,40 @@ const ProductListPageComponent = ({ getProducts }) => {
         <Col md={3}>
           <ListGroup>
             <ListGroup.Item className="mb-3 mt-3">
-              <SortOptionsComponent />
+              <SortOptionsComponent setSortOption={setSortOption} />
             </ListGroup.Item>
             <ListGroup.Item>
-              <span className="fw-bold">Filter</span>
+              <span className="fw-bold">Set Price Limit</span>
               <br />
-              <PriceFilterComponent />
+              <PriceFilterComponent price={price} setPrice={setPrice} />
             </ListGroup.Item>
             <ListGroup.Item>
-              <RatingFilterComponent />
+              <RatingFilterComponent
+                setRatingsFromFilter={setRatingsFromFilter}
+              />
             </ListGroup.Item>
+            {!location.pathname.match(/\/category/) && (
+              <ListGroup.Item>
+                <CategoryFilterComponent
+                  setCategoriesFromFilter={setCategoriesFromFilter}
+                />
+              </ListGroup.Item>
+            )}
             <ListGroup.Item>
-              <CategoryFilterComponent />
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <AttributesFilterComponent />
+              <AttributesFilterComponent
+                attrsFilter={attrsFilter}
+                setAttrsFromFilter={setAttrsFromFilter}
+              />
             </ListGroup.Item>
             <ListGroupItem>
-              <Button variant="primary">Filter</Button>{" "}
-              <Button variant="danger">Reset filters</Button>
+              <Button onClick={handleFilters} variant="primary">
+                Filter
+              </Button>{" "}
+              {showResetFiltersButton && (
+                <Button onClick={resetFilters} variant="danger">
+                  Reset filters
+                </Button>
+              )}
             </ListGroupItem>
           </ListGroup>
         </Col>
