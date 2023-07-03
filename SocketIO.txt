@@ -1,0 +1,12 @@
+Socket.IO is used for real time bi-directional communication between the client and the server.
+Socket.io allows us to build and display admin analysis charts dynamically.
+Socket.io also allows us to implement the chat functionality between the user and the admin.
+When a user creates an order it will be seen immediately on the admin analytics page without the need to refresh the page.
+
+In order to use socket.io package we need to install two socket.io packages, one for the backend and one for the frontend.
+
+Installing socket.io:
+Backend folder command: npm i socket.io@^4.4.1
+Frontend folder command: npm i socket.io-client@^4.4.1
+
+Configure server.js in the backend folder in order to use socket.io
