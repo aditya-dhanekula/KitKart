@@ -12,151 +12,241 @@ import {
 import AddedToCartMessageComponent from "../../components/AddedToCartMessageComponent";
 import { Rating } from "react-simple-star-rating";
 import ImageZoom from "js-image-zoom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 
 const ProductDetailsPageComponent = ({
   addToCartReduxAction,
   reduxDispatch,
+  getProductDetails,
+  userInfo,
+  writeReviewApiRequest,
 }) => {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
-  const [showCartMessage, setShowCartMessage] = useState(false)
+  const [showCartMessage, setShowCartMessage] = useState(false);
+  const [product, setProduct] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [productReviewed, setProductReviewed] = useState(false);
+
+  const messageEndRef = useRef(null);
 
   const addToCartHandler = () => {
     reduxDispatch(addToCartReduxAction(id, quantity));
     setShowCartMessage(true);
   };
 
-  var options = {
-    scale: 2,
-    offset: { vertical: 0, horizontal: 0 },
-  };
   useEffect(() => {
-    new ImageZoom(document.getElementById("first"), options);
-    new ImageZoom(document.getElementById("second"), options);
-    new ImageZoom(document.getElementById("third"), options);
-    new ImageZoom(document.getElementById("fourth"), options);
+    if (productReviewed) {
+      setTimeout(() => {
+        messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }, 200);
+    }
+  }, [productReviewed]);
+
+  useEffect(() => {
+    if (product.images) {
+      var options = {
+        scale: 2,
+        offset: { vertical: 0, horizontal: 0 },
+      };
+      product.images.map(
+        (image, id) =>
+          new ImageZoom(document.getElementById(`imageId${id + 1}`), options)
+      );
+    }
   });
+
+  useEffect(() => {
+    getProductDetails(id)
+      .then((data) => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch((er) =>
+        setError(
+          er.response.data.message ? er.response.data.message : er.response.data
+        )
+      );
+  }, [id, productReviewed]);
+
+  const sendReviewHandler = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget.elements;
+    const formInputs = {
+      comment: form.comment.value,
+      rating: form.rating.value,
+    };
+    if (e.currentTarget.checkValidity() === true) {
+      writeReviewApiRequest(product._id, formInputs)
+        .then((data) => {
+          if (data === "Review created") {
+            setProductReviewed("You successfully reviewed the product!");
+          }
+        })
+        .catch((er) =>
+          setProductReviewed(
+            er.response.data.message
+              ? er.response.data.message
+              : er.response.data
+          )
+        );
+    }
+  };
+
   return (
     <Container>
-      <AddedToCartMessageComponent showCartMessage={showCartMessage} setShowCartMessage={setShowCartMessage} ></AddedToCartMessageComponent>
+      <AddedToCartMessageComponent
+        showCartMessage={showCartMessage}
+        setShowCartMessage={setShowCartMessage}
+      ></AddedToCartMessageComponent>
       <Row className="mt-5">
-        <Col style={{ zIndex: 1 }} md={4}>
-          <div id="first">
-            <Image
-              crossOrigin="anonymous"
-              fluid
-              src="/images/games-category.png"
-            ></Image>
-          </div>
-          <br />
-          <div id="second">
-            <Image fluid src="/images/monitors-category.png"></Image>
-          </div>
-          <br />
-          <div id="third">
-            <Image fluid src="/images/tablets-category.png"></Image>
-          </div>
-          <br />
-          <div id="fourth">
-            <Image fluid src="/images/games-category.png"></Image>
-          </div>
-          <br />
-        </Col>
-        <Col md={8}>
-          <Row>
+        {loading ? (
+          <h2>Loading Product Details ....</h2>
+        ) : error ? (
+          <h2>{error}</h2>
+        ) : (
+          <>
+            <Col style={{ zIndex: 1 }} md={4}>
+              {product.images
+                ? product.images.map((image, id) => (
+                    <div key={id}>
+                      <div key={id} id={`imageId${id + 1}`}>
+                        <Image
+                          crossOrigin="anonymous"
+                          fluid
+                          src={`${image.path ?? null}`}
+                        />
+                      </div>
+                      <br />
+                    </div>
+                  ))
+                : null}
+            </Col>
             <Col md={8}>
-              <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <h1>Product Name</h1>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Rating readonly size={20} initialValue={4} />
-                  (1)
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  Price <span className="fw-bold">$345</span>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  Porta ac consectetur ac ehfuw cwsbfiw sbvbsiwif whuifs
-                  uofuswfbs visubviusb
-                </ListGroup.Item>
-              </ListGroup>
+              <Row>
+                <Col md={8}>
+                  <ListGroup variant="flush">
+                    <ListGroup.Item>
+                      <h1>{product.name}</h1>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Rating
+                        readonly
+                        size={20}
+                        initialValue={product.rating}
+                      />
+                      ({product.reviewsNumber})
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      Price <span className="fw-bold">${product.price}</span>
+                    </ListGroup.Item>
+                    <ListGroup.Item>{product.description}</ListGroup.Item>
+                  </ListGroup>
+                </Col>
+                <Col md={4}>
+                  <ListGroup>
+                    <ListGroup.Item>
+                      Status: {product.count > 0 ? "In Stock" : "Out of Stock"}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      Price: <span className="fw-bold">${product.price}</span>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      Quantity:
+                      <Form.Select
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        size="lg"
+                        aria-label="default select example"
+                      >
+                        {[...Array(product.count).keys()].map((x) => (
+                          <option key={x + 1} value={x + 1}>
+                            {x + 1}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Button onClick={addToCartHandler} variant="danger">
+                        Add To Cart
+                      </Button>
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="mt-5">
+                  <h5>REVIEWS</h5>
+                  <ListGroup variant="flush">
+                    {product.reviews &&
+                      product.reviews.map((review, idx) => (
+                        <ListGroup.Item key={idx}>
+                          {review.user.name}
+                          <br />
+                          <Rating
+                            readonly
+                            size={20}
+                            initialValue={review.rating}
+                          ></Rating>
+                          <br />
+                          {review.createdAt.substring(0, 10)} <br />
+                          {review.comment}
+                          <br />
+                        </ListGroup.Item>
+                      ))}
+                    <div ref={messageEndRef} />
+                  </ListGroup>
+                </Col>
+              </Row>
+              <hr />
+              <span className="fw-bold">Send Review Form</span>
+              {!userInfo.name && (
+                <Alert variant="danger">Login first to write a review</Alert>
+              )}
+
+              <Form onSubmit={sendReviewHandler}>
+                <FormGroup
+                  className="mb-3"
+                  controlId="exampleForm.ControlInput1"
+                >
+                  <Form.Label>Write a review</Form.Label>
+                  <Form.Control
+                    name="comment"
+                    required
+                    disabled={!userInfo.name}
+                    as="textarea"
+                    rows={3}
+                  ></Form.Control>
+                </FormGroup>
+                <Form.Select
+                  name="rating"
+                  required
+                  disabled={!userInfo.name}
+                  aria-label="Default Select example"
+                >
+                  <option value="">Your Rating</option>
+                  <option value="5">5 (Very Good)</option>
+                  <option value="4">4 (Good)</option>
+                  <option value="3">3 (Average)</option>
+                  <option value="2">2 (Bad)</option>
+                  <option value="1">1 (Very Bad)</option>
+                </Form.Select>
+                <Button
+                  type="submit"
+                  disabled={!userInfo.name}
+                  className="mt-3 mb-3"
+                  variant="primary"
+                >
+                  Submit Review
+                </Button>
+                <br />
+                {productReviewed}
+              </Form>
             </Col>
-            <Col md={4}>
-              <ListGroup>
-                <ListGroup.Item>Status: In Stock</ListGroup.Item>
-                <ListGroup.Item>
-                  Price: <span className="fw-bold">$345</span>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  Quantity:
-                  <Form.Select
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    size="lg"
-                    aria-label="default select example"
-                  >
-                    <option>Choose</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                  </Form.Select>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Button onClick={addToCartHandler} variant="danger">
-                    Add To Cart
-                  </Button>
-                </ListGroup.Item>
-              </ListGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col className="mt-5">
-              <h5>REVIEWS</h5>
-              <ListGroup variant="flush">
-                {Array.from({ length: 10 }).map((item, idx) => (
-                  <ListGroup.Item key={idx}>
-                    Aditya Dhanekula
-                    <br />
-                    <Rating readonly size={20} initialValue={4}></Rating>
-                    <br />
-                    20-01-2023 <br />
-                    I recently dined at the place and was thoroughly impressed
-                    by both the exquisite cuisine and the impeccable service.
-                    The menu showcased a variety of innovative dishes, blending
-                    bold flavors and beautiful presentation. The attentive and
-                    knowledgeable staff ensured that our meal was a memorable
-                    one, providing excellent recommendations and ensuring our
-                    satisfaction.
-                    <br />
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </Col>
-          </Row>
-          <hr />
-          <span className="fw-bold">Send Review Form</span>
-          <Alert variant="danger">Login first to write a review</Alert>
-          <Form>
-            <FormGroup className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Write a review</Form.Label>
-              <Form.Control as="textarea" rows={3}></Form.Control>
-            </FormGroup>
-            <Form.Select aria-label="Default Select example">
-              <option>Your Rating</option>
-              <option value="5">5 (Very Good)</option>
-              <option value="4">4 (Good)</option>
-              <option value="3">3 (Average)</option>
-              <option value="2">2 (Bad)</option>
-              <option value="1">1 (Very Bad)</option>
-            </Form.Select>
-            <Button className="mt-3 mb-3" variant="primary">
-              Submit Review
-            </Button>
-          </Form>
-        </Col>
+          </>
+        )}
       </Row>
     </Container>
   );
