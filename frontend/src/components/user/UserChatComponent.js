@@ -44,9 +44,7 @@ const UserChatComponent = () => {
       return;
     }
     setMessageReceived(false);
-    socket.emit("client sends message", {
-      message: v,
-    });
+    socket.emit("client sends message", v);
     setChat((chat) => {
       return [...chat, { client: v }];
     });

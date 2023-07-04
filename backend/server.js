@@ -13,28 +13,43 @@ app.use(cookieParser());
 app.use(fileUpload());
 
 const admins = [];
+let activeChats = [];
+
+function get_random(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
 
 io.on("connection", (socket) => {
   socket.on("admin connected with server", (adminName) => {
     admins.push({ id: socket.id, admin: adminName });
-    console.log(admins);
   });
 
-  socket.on("client sends message", ({ message }) => {
+  socket.on("client sends message", (msg) => {
     if (admins.length === 0) {
       // emit only sends the message back to the sender who sent client sends message
       socket.emit("no admin", "");
     } else {
+      let client = activeChats.find((client) => client.clientId === socket.id);
+      let targetAdminId;
+      if (client) {
+        targetAdminId = client.adminId;
+      } else {
+        let admin = get_random(admins);
+        activeChats.push({ clientId: socket.id, adminId: admin.id });
+        targetAdminId = admin.id;
+      }
       // broadcast.emit sends the message to all the clients except the sender
-      socket.broadcast.emit(
-        "server sends message from client to admin",
-        message
-      );
+      socket.broadcast
+        .to(targetAdminId)
+        .emit("server sends message from client to admin", {
+          user: socket.id,
+          message: msg,
+        });
     }
   });
 
-  socket.on("admin sends message", ({ message }) => {
-    socket.broadcast.emit("server sends message from admin to client", message);
+  socket.on("admin sends message", ({ user, message }) => {
+    socket.broadcast.to(user).emit("server sends message from admin to client", message);
   });
 
   socket.on("disconnect", (reason) => {
