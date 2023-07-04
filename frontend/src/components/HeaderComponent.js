@@ -103,11 +103,11 @@ const HeaderComponent = () => {
       <Container>
         {userInfo && userInfo.isAdmin ? (
           <LinkContainer to="/admin/products">
-            <Navbar.Brand href="/admin/products">BEST ONLINE SHOP</Navbar.Brand>
+            <Navbar.Brand href="/admin/products">KITKART</Navbar.Brand>
           </LinkContainer>
         ) : (
           <LinkContainer to="/">
-            <Navbar.Brand href="/">BEST ONLINE SHOP</Navbar.Brand>
+            <Navbar.Brand href="/">KITKART</Navbar.Brand>
           </LinkContainer>
         )}
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
