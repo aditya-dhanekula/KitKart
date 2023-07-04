@@ -14,6 +14,13 @@ const UserChatComponent = () => {
     if (!userInfo.isAdmin) {
       const socket = socketIOClient();
       setSocket(socket);
+      socket.on("server sends message from admin to client", (msg) => {
+        setChat((chat) => {
+          return [...chat, { admin: msg }];
+        });
+        const chatMessages = document.querySelector(".cht-msg");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
       return () => socket.disconnect();
     }
   }, [userInfo.isAdmin]);
@@ -27,16 +34,18 @@ const UserChatComponent = () => {
     if (v === "" || v === null || v === false || !v) {
       return;
     }
-    socket.emit("client sends message", v);
+    socket.emit("client sends message", {
+      message: v,
+    });
     setChat((chat) => {
       return [...chat, { client: v }];
     });
     msg.focus();
     setTimeout(() => {
-        msg.value = ""
-        const chatMessages = document.querySelector(".cht-msg")
-        chatMessages.scrollTop = chatMessages.scrollHeight
-    }, 200)
+      msg.value = "";
+      const chatMessages = document.querySelector(".cht-msg");
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 200);
   };
 
   return !userInfo.isAdmin ? (

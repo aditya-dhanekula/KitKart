@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCategories } from "../redux/actions/categoryActions";
 import socketIOClient from "socket.io-client";
-import { setChatRooms } from "../redux/actions/chatActions";
+import { setChatRooms, setSocket } from "../redux/actions/chatActions";
 
 const HeaderComponent = () => {
   const dispatch = useDispatch();
@@ -59,7 +59,8 @@ const HeaderComponent = () => {
   useEffect(() => {
     if (userInfo.isAdmin) {
       const socket = socketIOClient();
-      socket.on("server sends message from client to admin", ({ message }) => {
+      socket.on("server sends message from client to admin", (message) => {
+        dispatch(setSocket(socket))
         // console.log("HEADER", message)
         // to do
         dispatch(setChatRooms("exampleUser", message));
