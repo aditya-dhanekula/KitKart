@@ -16,13 +16,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCategories } from "../redux/actions/categoryActions";
 import socketIOClient from "socket.io-client";
-import { setChatRooms, setSocket } from "../redux/actions/chatActions";
+import {
+  setChatRooms,
+  setSocket,
+  setMessageReceived,
+} from "../redux/actions/chatActions";
 
 const HeaderComponent = () => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.userRegisterLogin);
   const itemsCount = useSelector((state) => state.cart.itemsCount);
   const { categories } = useSelector((state) => state.getCategories);
+  const { messageReceived } = useSelector((state) => state.adminChat);
 
   const [searchCategoryToggle, setSearchCategoryToggle] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,10 +65,11 @@ const HeaderComponent = () => {
     if (userInfo.isAdmin) {
       const socket = socketIOClient();
       socket.on("server sends message from client to admin", (message) => {
-        dispatch(setSocket(socket))
+        dispatch(setSocket(socket));
         // console.log("HEADER", message)
         // to do
         dispatch(setChatRooms("exampleUser", message));
+        dispatch(setMessageReceived(true));
       });
     }
   }, [userInfo.isAdmin]);
@@ -109,9 +115,9 @@ const HeaderComponent = () => {
             {userInfo && userInfo.isAdmin ? (
               <LinkContainer to="/admin/orders">
                 <Nav.Link>
-                  <Badge pill bg="primary">
-                    2
-                  </Badge>
+                  {messageReceived && (
+                    <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                  )}
                   <span className="ms-1">{`${userInfo.name} ${userInfo.lastName}`}</span>
                 </Nav.Link>
               </LinkContainer>
