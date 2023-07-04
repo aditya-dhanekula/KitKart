@@ -63,7 +63,7 @@ const HeaderComponent = () => {
   };
 
   useEffect(() => {
-    if (userInfo.isAdmin) {
+    if (userInfo && userInfo.isAdmin) {
       var audio = new Audio("/audio/chat-msg.mp3");
       const socket = socketIOClient();
       socket.emit(
@@ -96,14 +96,20 @@ const HeaderComponent = () => {
       });
       return () => socket.disconnect();
     }
-  }, [userInfo.isAdmin]);
+  }, [userInfo]);
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
-        <LinkContainer to="/">
-          <Navbar.Brand href="/">BEST ONLINE SHOP</Navbar.Brand>
-        </LinkContainer>
+        {userInfo && userInfo.isAdmin ? (
+          <LinkContainer to="/admin/products">
+            <Navbar.Brand href="/admin/products">BEST ONLINE SHOP</Navbar.Brand>
+          </LinkContainer>
+        ) : (
+          <LinkContainer to="/">
+            <Navbar.Brand href="/">BEST ONLINE SHOP</Navbar.Brand>
+          </LinkContainer>
+        )}
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
@@ -137,14 +143,21 @@ const HeaderComponent = () => {
           </Nav>
           <Nav>
             {userInfo && userInfo.isAdmin ? (
-              <LinkContainer to="/admin/orders">
-                <Nav.Link>
-                  {messageReceived && (
-                    <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
-                  )}
-                  <span className="ms-1">{`${userInfo.name} ${userInfo.lastName}`}</span>
-                </Nav.Link>
-              </LinkContainer>
+              <>
+                <LinkContainer to="/admin/orders">
+                  <Nav.Link>
+                    <span className="ms-1">Admin</span>
+                  </Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/admin/chats">
+                  <Nav.Link>
+                    {messageReceived && (
+                      <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                    )}
+                    <span className="ms-1">Chats</span>
+                  </Nav.Link>
+                </LinkContainer>
+              </>
             ) : userInfo && userInfo.name && !userInfo.isAdmin ? (
               <NavDropdown
                 title={`${userInfo.name} ${userInfo.lastName}`}
@@ -174,16 +187,20 @@ const HeaderComponent = () => {
                 </LinkContainer>
               </>
             )}
-            <LinkContainer to="/cart">
-              <Nav.Link>
-                <Badge pill bg="success">
-                  {itemsCount === 0 ? "" : itemsCount}
-                </Badge>
-                <span className="ms-1"></span>
-                <i className="bi bi-cart2"></i>
-                <span className="ms-1">CART</span>
-              </Nav.Link>
-            </LinkContainer>
+            {userInfo && userInfo.isAdmin ? (
+              ""
+            ) : (
+              <LinkContainer to="/cart">
+                <Nav.Link>
+                  <Badge pill bg="success">
+                    {itemsCount === 0 ? "" : itemsCount}
+                  </Badge>
+                  <span className="ms-1"></span>
+                  <i className="bi bi-cart2"></i>
+                  <span className="ms-1">CART</span>
+                </Nav.Link>
+              </LinkContainer>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
