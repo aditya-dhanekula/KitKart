@@ -12,13 +12,37 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(fileUpload());
 
+const admins = [];
+
 io.on("connection", (socket) => {
-  socket.on("client sends message", ({message}) => {
-    socket.broadcast.emit("server sends message from client to admin", message);
+  socket.on("admin connected with server", (adminName) => {
+    admins.push({ id: socket.id, admin: adminName });
+    console.log(admins);
+  });
+
+  socket.on("client sends message", ({ message }) => {
+    if (admins.length === 0) {
+      // emit only sends the message back to the sender who sent client sends message
+      socket.emit("no admin", "");
+    } else {
+      // broadcast.emit sends the message to all the clients except the sender
+      socket.broadcast.emit(
+        "server sends message from client to admin",
+        message
+      );
+    }
   });
 
   socket.on("admin sends message", ({ message }) => {
     socket.broadcast.emit("server sends message from admin to client", message);
+  });
+
+  socket.on("disconnect", (reason) => {
+    // admin disconnected
+    const removeIndex = admins.findIndex((item) => item.id === socket.id);
+    if (removeIndex !== -1) {
+      admins.splice(removeIndex, 1);
+    }
   });
 });
 

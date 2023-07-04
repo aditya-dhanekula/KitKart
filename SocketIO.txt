@@ -10,3 +10,6 @@ Backend folder command: npm i socket.io@^4.4.1
 Frontend folder command: npm i socket.io-client@^4.4.1
 
 Configure server.js in the backend folder in order to use socket.io
+
+Emit only sends the message back to the sender who sent client sends message.
+Broadcast.emit sends the message to all the clients except the sender.

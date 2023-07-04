@@ -13,18 +13,23 @@ const UserChatComponent = () => {
 
   useEffect(() => {
     if (!userInfo.isAdmin) {
-      var audio = new Audio("/audio/chat-msg.mp3")
+      var audio = new Audio("/audio/chat-msg.mp3");
       const socket = socketIOClient();
-      setSocket(socket);
+      socket.on("no admin", (msg) => {
+        setChat((chat) => {
+          return [...chat, { admin: "Support currently unavailable" }];
+        });
+      });
       socket.on("server sends message from admin to client", (msg) => {
         setChat((chat) => {
           return [...chat, { admin: msg }];
         });
         setMessageReceived(true);
-        audio.play()
+        audio.play();
         const chatMessages = document.querySelector(".cht-msg");
         chatMessages.scrollTop = chatMessages.scrollHeight;
       });
+      setSocket(socket);
       return () => socket.disconnect();
     }
   }, [userInfo.isAdmin]);
