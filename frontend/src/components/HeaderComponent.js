@@ -15,9 +15,8 @@ import { logout } from "../redux/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getCategories } from "../redux/actions/categoryActions";
-import socketIOClient from "socket.io-client"
-import { setChatRooms } from "../redux/actions/chatActions"
-
+import socketIOClient from "socket.io-client";
+import { setChatRooms } from "../redux/actions/chatActions";
 
 const HeaderComponent = () => {
   const dispatch = useDispatch();
@@ -53,19 +52,20 @@ const HeaderComponent = () => {
         `/product-list/category/${searchCategoryToggle.replaceAll("/", ",")}`
       );
     } else {
-      navigate("/product-list")
+      navigate("/product-list");
     }
   };
 
   useEffect(() => {
-    if(userInfo.isAdmin) {
-      const socket = socketIOClient()
-      socket.on("server sends message from client to admin", ({message}) => {
+    if (userInfo.isAdmin) {
+      const socket = socketIOClient();
+      socket.on("server sends message from client to admin", ({ message }) => {
+        // console.log("HEADER", message)
         // to do
-        dispatch(setChatRooms("exampleUser", message))
-      })
+        dispatch(setChatRooms("exampleUser", message));
+      });
     }
-  }, [userInfo.isAdmin])
+  }, [userInfo.isAdmin, dispatch]);
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
