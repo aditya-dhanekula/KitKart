@@ -49,7 +49,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("admin sends message", ({ user, message }) => {
-    socket.broadcast.to(user).emit("server sends message from admin to client", message);
+    socket.broadcast
+      .to(user)
+      .emit("server sends message from admin to client", message);
+  });
+
+  socket.on("admin closes chat", (socketId) => {
+    socket.broadcast.to(socketId).emit("admin closed chat", "");
+    let c = io.sockets.sockets.get(socketId);
+    c.disconnect();
   });
 
   socket.on("disconnect", (reason) => {
@@ -58,6 +66,19 @@ io.on("connection", (socket) => {
     if (removeIndex !== -1) {
       admins.splice(removeIndex, 1);
     }
+    activeChats = activeChats.filter((item) => item.adminId !== socket.id);
+
+    // client disconnected
+    const removeIndexClient = activeChats.findIndex(
+      (item) => item.clientId === socket.id
+    );
+    if (removeIndexClient !== -1) {
+      activeChats.splice(removeIndexClient, 1);
+    }
+    socket.broadcast.emit("disconnected", {
+      reason: reason,
+      socketId: socket.id,
+    });
   });
 });
 

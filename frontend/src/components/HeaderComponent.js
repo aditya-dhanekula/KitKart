@@ -20,6 +20,7 @@ import {
   setChatRooms,
   setSocket,
   setMessageReceived,
+  removeChatRoom,
 } from "../redux/actions/chatActions";
 
 const HeaderComponent = () => {
@@ -69,13 +70,29 @@ const HeaderComponent = () => {
         "admin connected with server",
         "Admin" + Math.floor(Math.random() * 1000000000000)
       );
-      socket.on("server sends message from client to admin", ({user, message}) => {
-        dispatch(setSocket(socket));
-        // console.log("HEADER", message)
-        // to do
-        dispatch(setChatRooms(user, message));
-        dispatch(setMessageReceived(true));
-        audio.play();
+      socket.on(
+        "server sends message from client to admin",
+        ({ user, message }) => {
+          dispatch(setSocket(socket));
+          // let chatRooms = {
+          //   fddf54gfgSocketId: [
+          //     { client: "dsfsf" },
+          //     { client: "wdfawf" },
+          //     { admin: "bfbfxcc" },
+          //   ],
+          //   fchszdgfgSocketId: [
+          //     { client: "sczcz" },
+          //     { client: "cszcczc" },
+          //     { admin: "adczsc" },
+          //   ],
+          // };
+          dispatch(setChatRooms(user, message));
+          dispatch(setMessageReceived(true));
+          audio.play();
+        }
+      );
+      socket.on("disconnected", ({ reason, socketId }) => {
+        dispatch(removeChatRoom(socketId));
       });
       return () => socket.disconnect();
     }
