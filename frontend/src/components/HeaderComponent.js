@@ -65,7 +65,7 @@ const HeaderComponent = () => {
         dispatch(setChatRooms("exampleUser", message));
       });
     }
-  }, [userInfo.isAdmin, dispatch]);
+  }, [userInfo.isAdmin]);
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
