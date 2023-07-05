@@ -116,7 +116,7 @@ const HeaderComponent = () => {
                 title={searchCategoryToggle}
               >
                 <Dropdown.Item onClick={() => setSearchCategoryToggle("All")}>
-                  All
+                  All Categories
                 </Dropdown.Item>
                 {categories.map((category, id) => (
                   <Dropdown.Item
