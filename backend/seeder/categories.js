@@ -103,7 +103,7 @@ const categories = [
     name: "Computers/Monitors",
     description:
       "Explore a diverse range of monitors with different sizes, resolutions, and features. Whether for gaming, graphic design, or office work, find the perfect monitor to enhance your viewing experience, improve productivity, and enjoy immersive visuals.",
-    image: "/images/monitors-category.jpeg",
+    image: "/images/monitors-category.png",
   },
   {
     name: "Computers/Laptops/Lenovo",
